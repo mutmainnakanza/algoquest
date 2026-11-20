@@ -86,7 +86,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStart, onOpenMater
             </div>
 
             <a
-              href="/AlgoQuest_SMKN4Palopo.html"
+              href="./AlgoQuest_SMKN4Palopo.html"
               download="AlgoQuest_SMKN4Palopo.html"
               onClick={() => soundEngine.playClick()}
               className="inline-flex items-center gap-2 text-[#00F5D4] hover:text-[#FEE440] font-semibold transition-colors whitespace-nowrap"
