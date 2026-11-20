@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlgoQuest: Petualangan Logika Algoritma dan Pemrograman SMK</title>
+  <style>
+    :root {
+      --bg-deep: #120d47;
+      --bg-base: #1b1464;
+      --surface: #2d1b69;
+      --surface-alt: #231757;
+      --cyan: #00f5d4;
+      --yellow: #fee440;
+      --danger: #ff4d6d;
+      --success: #10b981;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --font-display: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+      --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      background-image:
+        linear-gradient(to right, rgba(0, 245, 212, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 245, 212, 0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+
+    button, input, select { font-family: inherit; }
+
+    .topbar {
+      background: rgba(18, 13, 71, 0.92);
+      border-bottom: 1px solid rgba(0, 245, 212, 0.25);
+      padding: 0 20px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 800;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .brand span { color: var(--cyan); }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .nav-link.active, .nav-link:hover { color: var(--cyan); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 13px 22px;
+      cursor: pointer;
+      transition: transform 0.14s ease, opacity 0.14s ease;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-cyan { background: var(--cyan); color: var(--bg-base); border-bottom: 4px solid #00a891; }
+    .btn-yellow { background: var(--yellow); color: var(--bg-base); border-bottom: 4px solid #bfa600; }
+    .btn-dark { background: var(--bg-base); color: #fff; border: 1px solid rgba(0, 245, 212, 0.55); border-bottom: 4px solid var(--cyan); }
+    .btn-surface { background: var(--surface); color: #fff; border: 1px solid rgba(255,255,255,0.22); }
+    .btn-sm { font-size: 15px; padding: 9px 14px; }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      flex: 1;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 960px) {
+      .grid-2 { grid-template-columns: 1.25fr 0.95fr; align-items: center; }
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 900px) {
+      .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(44px, 6vw, 68px);
+      font-weight: 900;
+      line-height: 1.05;
+      margin: 10px 0;
+    }
+    .hero-title span { color: var(--cyan); }
+    .hero-sub { font-size: 22px; font-weight: 700; color: var(--yellow); margin-bottom: 12px; }
+    .cta-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 20px; }
+
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      border-radius: 14px;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+    }
+
+    .arena-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    @media (min-width: 980px) {
+      .arena-layout { grid-template-columns: 1.3fr 1fr; align-items: start; }
+    }
+
+    canvas#maze-canvas {
+      width: 100%;
+      height: 400px;
+      background: var(--bg-deep);
+      border: 1px solid rgba(0, 245, 212, 0.35);
+      border-radius: 14px;
+      display: block;
+    }
+
+    .block-palette {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .workspace-list {
+      background: var(--bg-deep);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 200px;
+      max-height: 310px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .block-item {
+      background: var(--bg-base);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .block-item.active-step {
+      border: 2px solid var(--yellow);
+      background: rgba(254, 228, 64, 0.18);
+    }
+
+    .block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .nested-children {
+      margin-top: 8px;
+      margin-left: 14px;
+      padding-left: 10px;
+      border-left: 2px solid var(--cyan);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .debug-box {
+      margin-top: 12px;
+      background: #45122b;
+      border: 2px solid var(--danger);
+      border-radius: 12px;
+      padding: 14px;
+      color: #ffe5ec;
+      display: none;
+    }
+    .debug-box.show { display: block; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 7, 45, 0.86);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: var(--surface);
+      border: 2px solid var(--cyan);
+      border-radius: 18px;
+      max-width: 640px;
+      width: 100%;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .quiz-opt {
+      width: 100%;
+      text-align: left;
+      background: var(--bg-base);
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .quiz-opt:hover { border-color: var(--cyan); }
+
+    .cert-box {
+      background: var(--bg-deep);
+      border: 4px solid var(--cyan);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+    }
+    .cert-inner {
+      border: 2px solid rgba(254, 228, 64, 0.65);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .stage-btn {
+      background: var(--bg-base);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 4px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .stage-btn.done {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0, 245, 212, 0.16);
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; color: #111; }
+      .cert-box { background: #fff; color: #111; border-color: #1b1464; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar no-print">
+    <button class="brand" onclick="goScreen('splash')">Algo<span>Quest</span></button>
+    <nav class="nav-links">
+      <button class="nav-link" onclick="goScreen('splash')">Menu Utama</button>
+      <button class="nav-link" onclick="goScreen('materi')">Materi Kilat</button>
+      <button class="nav-link" onclick="goScreen('levels')">Peta Level</button>
+      <button class="nav-link" onclick="goScreen('victory')">Rekap Hasil</button>
+    </nav>
+    <button id="mute-btn" class="btn btn-surface btn-sm" onclick="toggleMute()">Suara Aktif</button>
+  </header>
+
+  <main class="container">
+    <!-- SCREEN 1: SPLASH -->
+    <section id="screen-splash" class="screen active">
+      <div class="card grid-2">
+        <div>
+          <p style="color: var(--cyan); font-weight: 700;">SMKN 4 Kota Palopo · Konsentrasi Keahlian PPLG</p>
+          <h1 class="hero-title">Algo<span>Quest</span></h1>
+          <p class="hero-sub">Petualangan Logika Algoritma dan Pemrograman SMK</p>
+          <p style="color: var(--muted); font-size: 17px;">
+            Pelajari runtunan, percabangan, dan perulangan melalui 15 tantangan labirin interaktif pada mata pelajaran Dasar-Dasar Keahlian PPLG Kelas X.
+          </p>
+          <div class="cta-row">
+            <button class="btn btn-cyan" onclick="playClick(); goScreen('levels')">Mulai</button>
+            <button class="btn btn-yellow" onclick="playClick(); goScreen('materi')">Materi Kilat</button>
+            <button class="btn btn-dark" onclick="playClick(); openModal('modal-guide')">Petunjuk</button>
+          </div>
+          <p style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.14); font-size: 15px; color: var(--muted);">
+            Pengembang: <strong style="color:#fff;">Mutmainna, S.Kom</strong> · SMKN 4 Kota Palopo
+          </p>
+        </div>
+        <div style="background: var(--bg-base); border: 1px solid rgba(0,245,212,0.25); border-radius: 16px; padding: 24px; text-align: center;">
+          <svg viewBox="0 0 220 220" width="210" height="210" aria-label="Robot Cyborg AlgoQuest">
+            <rect x="106" y="18" width="8" height="22" rx="3" fill="#00F5D4"/>
+            <circle cx="110" cy="14" r="9" fill="#FEE440"/>
+            <rect x="48" y="38" width="124" height="84" rx="20" fill="#3B278C" stroke="#00F5D4" stroke-width="4"/>
+            <rect x="62" y="54" width="96" height="48" rx="12" fill="#0E0A38" stroke="#4B3B9E" stroke-width="2.5"/>
+            <rect x="78" y="68" width="18" height="20" rx="4" fill="#00F5D4"/>
+            <rect x="124" y="68" width="18" height="20" rx="4" fill="#00F5D4"/>
+            <path d="M 96 93 Q 110 100 124 93" fill="none" stroke="#FEE440" stroke-width="3.5" stroke-linecap="round"/>
+            <rect x="56" y="130" width="108" height="64" rx="16" fill="#3B278C" stroke="#00F5D4" stroke-width="4"/>
+            <rect x="74" y="144" width="72" height="36" rx="8" fill="#120D47" stroke="#FEE440" stroke-width="2.5"/>
+            <text x="110" y="167" text-anchor="middle" fill="#00F5D4" font-size="16" font-weight="700">{ }</text>
+          </svg>
+          <p style="font-family: var(--font-mono); color: var(--cyan); font-weight: 700; margin-top: 8px;">UNIT ALGO-BOT X10</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: MATERI KILAT -->
+    <section id="screen-materi" class="screen">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <p style="color:var(--cyan); font-weight:700;">Materi Kilat · Dasar Pemrograman</p>
+          <h2 style="font-size:32px; font-weight:800;">Simbol Flowchart &amp; Struktur Logika</h2>
+        </div>
+        <div id="materi-counter" style="font-family:var(--font-mono); color:var(--yellow); font-weight:700; font-size:18px;">Kartu 1 / 6</div>
+      </div>
+      <div class="card grid-2" style="align-items:stretch;">
+        <div style="background:var(--bg-deep); border:1px solid rgba(0,245,212,0.25); border-radius:14px; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
+          <div id="materi-cat" style="color:var(--yellow); font-weight:700;"></div>
+          <div id="materi-svg" style="width:100%;"></div>
+          <pre id="materi-code" style="width:100%; background:var(--bg-base); padding:12px; border-radius:10px; font-family:var(--font-mono); color:var(--cyan); font-size:14px; white-space:pre-wrap;"></pre>
+        </div>
+        <div style="display:flex; flex-direction:column; justify-content:space-between; gap:16px;">
+          <div>
+            <h3 id="materi-title" style="font-size:28px; color:var(--cyan); margin-bottom:10px;"></h3>
+            <p id="materi-desc" style="font-size:18px; margin-bottom:14px;"></p>
+            <ul id="materi-points" style="padding-left:20px; color:var(--muted); display:grid; gap:8px; font-size:16px;"></ul>
+          </div>
+          <div style="display:flex; justify-content:space-between; gap:12px; border-top:1px solid rgba(255,255,255,0.15); padding-top:16px;">
+            <button id="materi-prev" class="btn btn-dark btn-sm" onclick="changeMateri(-1)">Sebelumnya</button>
+            <button id="materi-next" class="btn btn-dark btn-sm" onclick="changeMateri(1)">Berikutnya</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:20px;">
+        <button class="btn btn-surface" onclick="playClick(); goScreen('splash')">Kembali ke Menu</button>
+        <button class="btn btn-cyan" onclick="playClick(); goScreen('levels')">Lanjut Bermain</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: LEVEL SELECT -->
+    <section id="screen-levels" class="screen">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+        <div>
+          <p style="color:var(--cyan); font-weight:700;">Peta Petualangan · 15 Tantangan Algoritma</p>
+          <h2 style="font-size:32px; font-weight:800;">Pilih Arena &amp; Stage</h2>
+        </div>
+        <div id="levels-summary" style="font-family:var(--font-mono); font-weight:700; color:var(--yellow); font-size:18px;"></div>
+      </div>
+      <div id="levels-grid" class="grid-3"></div>
+      <div style="margin-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <button class="btn btn-surface" onclick="playClick(); goScreen('splash')">Kembali</button>
+        <button class="btn btn-yellow" onclick="playClick(); goScreen('victory')">Lihat Rekap &amp; Sertifikat</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: ARENA -->
+    <section id="screen-arena" class="screen">
+      <div class="hud">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <button class="btn btn-dark btn-sm" onclick="playClick(); abortRun(); goScreen('levels')">Peta Level</button>
+          <div>
+            <div id="hud-level" style="font-family:var(--font-mono); font-size:13px; color:var(--cyan); font-weight:700;"></div>
+            <div id="hud-title" style="font-size:19px; font-weight:800;"></div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:18px; font-family:var(--font-mono); font-weight:700; font-size:18px;">
+          <div id="hud-lives" style="color:#ff8fa3;">Nyawa: 3/3</div>
+          <div id="hud-score" style="color:var(--yellow);">Skor: 0</div>
+        </div>
+      </div>
+
+      <div class="arena-layout">
+        <div class="card" style="padding:16px;">
+          <p id="stage-objective" style="font-weight:700; margin-bottom:10px;"></p>
+          <canvas id="maze-canvas"></canvas>
+          <div id="arena-status" style="margin-top:10px; background:var(--bg-base); border-radius:10px; padding:10px 14px; font-size:15px; color:var(--cyan);"></div>
+          <div id="debug-box" class="debug-box"></div>
+        </div>
+
+        <div class="card" style="padding:16px;">
+          <h3 style="font-size:20px; font-weight:800;">1. Blok Perintah</h3>
+          <div id="palette-area" class="block-palette"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; margin-bottom:6px;">
+            <h3 style="font-size:20px; font-weight:800;">2. Susunan Algoritma</h3>
+            <button class="btn btn-surface btn-sm" onclick="playClick(); clearBlocks()">Bersihkan</button>
+          </div>
+          <div id="workspace-list" class="workspace-list"></div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
+            <button id="btn-run" class="btn btn-cyan" style="grid-column:span 2;" onclick="runAlgorithm()">Jalankan (Run)</button>
+            <button class="btn btn-dark btn-sm" onclick="playClick(); resetStage(true)">Reset Level</button>
+            <button id="btn-pause" class="btn btn-yellow btn-sm" onclick="togglePause()" disabled>Pause</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: VICTORY -->
+    <section id="screen-victory" class="screen">
+      <div class="card no-print" style="margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px;">
+        <div>
+          <p style="color:var(--cyan); font-weight:700;">Rekapitulasi Hasil Belajar</p>
+          <h2 style="font-size:32px; font-weight:800;">Hasil Petualangan AlgoQuest</h2>
+          <p id="victory-feedback" style="color:var(--muted); margin-top:6px; max-width:650px;"></p>
+        </div>
+        <div style="background:var(--bg-base); border:1px solid var(--cyan); border-radius:14px; padding:16px 24px; text-align:center;">
+          <div id="victory-stars" style="font-size:28px; color:var(--yellow);"></div>
+          <div id="victory-score" style="font-family:var(--font-mono); font-size:32px; font-weight:800; color:var(--yellow);">0</div>
+          <div id="victory-stages" style="font-size:14px; color:var(--cyan);">0 / 15 Stage</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card no-print">
+          <h3 style="font-size:24px; margin-bottom:12px;">Sertifikat Digital KKTP</h3>
+          <label style="display:block; font-size:14px; color:var(--cyan); font-weight:700; margin-bottom:6px;">Nama Lengkap Siswa</label>
+          <input id="cert-name" type="text" placeholder="Ketik nama lengkap..." oninput="updateCertPreview()" style="width:100%; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.3); background:var(--bg-base); color:#fff; font-size:17px; margin-bottom:14px;" />
+          <label style="display:block; font-size:14px; color:var(--cyan); font-weight:700; margin-bottom:6px;">Kelas</label>
+          <input id="cert-class" type="text" value="X PPLG 1" oninput="updateCertPreview()" style="width:100%; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.3); background:var(--bg-base); color:#fff; font-size:17px; margin-bottom:18px;" />
+          <div style="display:grid; gap:10px;">
+            <button class="btn btn-cyan" onclick="playClick(); downloadCertPng()">Unduh Sertifikat (PNG)</button>
+            <button class="btn btn-yellow" onclick="playClick(); window.print()">Cetak Rekap / Sertifikat</button>
+          </div>
+        </div>
+
+        <div class="cert-box">
+          <div class="cert-inner">
+            <p style="color:var(--cyan); font-weight:700;">SMKN 4 KOTA PALOPO · KONSENTRASI KEAHLIAN PPLG</p>
+            <h3 style="font-size:28px; color:var(--yellow); margin:8px 0 14px;">SERTIFIKAT KELULUSAN ALGOQUEST</h3>
+            <p style="color:var(--muted);">Diberikan kepada:</p>
+            <p id="preview-name" style="font-size:30px; font-weight:800; margin:8px 0; border-bottom:2px solid var(--cyan); padding-bottom:6px;">Nama Peserta Didik</p>
+            <p id="preview-class" style="color:var(--yellow); font-weight:700; font-size:18px; margin-bottom:14px;">Kelas: X PPLG 1</p>
+            <p id="preview-metrics" style="font-family:var(--font-mono); font-size:17px; background:var(--bg-base); padding:12px; border-radius:10px;"></p>
+            <p style="margin-top:18px; font-weight:700;">Mutmainna, S.Kom</p>
+            <p style="font-size:13px; color:var(--cyan);">Guru PPLG · SMKN 4 Kota Palopo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-print" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:20px;">
+        <button class="btn btn-cyan" onclick="playClick(); sessionScore = 0; goScreen('levels')">Main Lagi</button>
+        <button class="btn btn-surface" onclick="playClick(); goScreen('splash')">Selesai</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL PETUNJUK -->
+  <div id="modal-guide" class="modal-backdrop">
+    <div class="modal-card">
+      <h2 style="color:var(--yellow); font-size:28px; margin-bottom:12px;">Petunjuk Bermain AlgoQuest</h2>
+      <p style="margin-bottom:10px;">1. Klik blok perintah (Maju, Belok Kiri, Belok Kanan, If, Repeat) untuk menyusun algoritma robot.</p>
+      <p style="margin-bottom:10px;">2. Tekan <strong>Jalankan</strong> agar robot bergerak langkah demi langkah di peta labirin.</p>
+      <p style="margin-bottom:10px;">3. Saat menyentuh Gerbang Logika, jawab pertanyaan flowchart atau pseudocode untuk mendapat <strong>+100 poin</strong>.</p>
+      <p style="margin-bottom:18px;">4. Jika menabrak tembok atau salah menjawab, nyawa berkurang 1 dan pesan debugging akan membantu Anda memperbaikinya.</p>
+      <button class="btn btn-cyan" onclick="playClick(); closeModal('modal-guide')">Mengerti, Tutup</button>
+    </div>
+  </div>
+
+  <!-- MODAL KUIS GERBANG LOGIKA -->
+  <div id="modal-quiz" class="modal-backdrop">
+    <div class="modal-card">
+      <p id="quiz-topic" style="color:var(--cyan); font-family:var(--font-mono); font-weight:700;"></p>
+      <h2 style="color:var(--yellow); font-size:24px; margin:6px 0 12px;">Gerbang Logika Terkunci</h2>
+      <p id="quiz-prompt" style="font-size:18px; font-weight:600;"></p>
+      <pre id="quiz-code" style="display:none; background:var(--bg-deep); color:var(--cyan); padding:12px; border-radius:10px; margin-top:10px; font-family:var(--font-mono); white-space:pre-wrap;"></pre>
+      <div id="quiz-options" style="margin-top:12px;"></div>
+      <div id="quiz-feedback" style="display:none; margin-top:14px; padding:12px; border-radius:10px; font-weight:600;"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============== WEB AUDIO 8-BIT CHIPTUNE ==============
+    let audioCtx = null;
+    let isMuted = false;
+
+    function tone(freq, dur, type = 'square', vol = 0.07, delay = 0) {
+      if (isMuted) return;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const t = audioCtx.currentTime + delay;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+    }
+
+    function playClick() { tone(660, 0.06, 'square', 0.05); }
+    function playStep() { tone(260, 0.08, 'triangle', 0.09); }
+    function playTurn() { tone(440, 0.06, 'square', 0.05); }
+    function playCorrect() { tone(523, 0.09); tone(659, 0.09, 'square', 0.07, 0.09); tone(784, 0.15, 'square', 0.08, 0.18); }
+    function playWrong() { tone(240, 0.15, 'sawtooth', 0.08); tone(150, 0.22, 'sawtooth', 0.08, 0.14); }
+    function playVictory() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.16, 'square', 0.08, i * 0.11)); }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('mute-btn').textContent = isMuted ? 'Suara Mati' : 'Suara Aktif';
+      if (!isMuted) playClick();
+    }
+
+    // ============== DATA MATERI KILAT ==============
+    const MATERI = [
+      {
+        cat: 'Simbol Flowchart',
+        title: 'Terminator (Mulai / Selesai)',
+        desc: 'Berbentuk oval/kapsul untuk menandai titik awal (Start) dan akhir (End) sebuah flowchart.',
+        points: ['Setiap flowchart diawali 1 simbol Mulai dan diakhiri Selesai.', 'Memiliki 1 garis aliran keluar atau masuk.'],
+        code: 'MULAI -> Proses -> SELESAI',
+        svg: '<svg viewBox="0 0 240 130" height="140"><rect x="45" y="10" width="150" height="40" rx="20" fill="#00F5D4"/><text x="120" y="36" text-anchor="middle" fill="#1B1464" font-weight="800">MULAI</text><line x1="120" y1="50" x2="120" y2="78" stroke="#FEE440" stroke-width="3"/><rect x="45" y="80" width="150" height="40" rx="20" fill="#FEE440"/><text x="120" y="106" text-anchor="middle" fill="#1B1464" font-weight="800">SELESAI</text></svg>'
+      },
+      {
+        cat: 'Simbol Flowchart',
+        title: 'Proses (Process)',
+        desc: 'Berbentuk persegi panjang untuk menyatakan aksi, operasi hitung, atau pemberian nilai variabel.',
+        points: ['Contoh: luas = p * l atau robot.maju().', 'Dijalankan berurutan mengikuti panah alur.'],
+        code: 'x = 10; y = 5; hasil = x + y;',
+        svg: '<svg viewBox="0 0 240 120" height="140"><rect x="25" y="34" width="190" height="52" rx="6" fill="#00F5D4"/><text x="120" y="65" text-anchor="middle" fill="#1B1464" font-weight="800">luas = p * l</text></svg>'
+      },
+      {
+        cat: 'Simbol Flowchart',
+        title: 'Keputusan (Decision)',
+        desc: 'Berbentuk belah ketupat untuk menguji syarat logika bernilai True (Ya) atau False (Tidak).',
+        points: ['Memiliki 1 panah masuk dan 2 cabang keluar (Ya dan Tidak).', 'Menjadi dasar percabangan If-Else dan Loop.'],
+        code: 'IF (x > 5) THEN Kanan ELSE Kiri',
+        svg: '<svg viewBox="0 0 240 130" height="140"><polygon points="120,12 195,62 120,112 45,62" fill="#FEE440"/><text x="120" y="67" text-anchor="middle" fill="#1B1464" font-weight="800">x &gt; 5 ?</text></svg>'
+      },
+      {
+        cat: 'Konsep Algoritma',
+        title: 'Runtunan (Sequencing)',
+        desc: 'Instruksi dieksekusi satu per satu secara berurutan dari baris pertama hingga terakhir.',
+        points: ['Urutan perintah sangat menentukan hasil akhir.', 'Setiap langkah dijalankan tepat satu kali.'],
+        code: '1. Maju()\n2. BelokKiri()\n3. Maju()',
+        svg: '<svg viewBox="0 0 240 130" height="140"><rect x="45" y="10" width="150" height="30" rx="6" fill="#00F5D4"/><text x="120" y="30" text-anchor="middle" fill="#1B1464" font-weight="800">1. Maju()</text><rect x="45" y="50" width="150" height="30" rx="6" fill="#FEE440"/><text x="120" y="70" text-anchor="middle" fill="#1B1464" font-weight="800">2. Belok()</text><rect x="45" y="90" width="150" height="30" rx="6" fill="#00F5D4"/><text x="120" y="110" text-anchor="middle" fill="#1B1464" font-weight="800">3. Maju()</text></svg>'
+      },
+      {
+        cat: 'Konsep Algoritma',
+        title: 'Percabangan (If - Else)',
+        desc: 'Memilih jalur aksi berbeda berdasarkan kondisi True atau False.',
+        points: ['Gunakan operator perbandingan (>, <, ==) dan logika (&&, ||, !).', 'Jika True jalankan IF, jika False jalankan ELSE.'],
+        code: 'IF (nilai >= 75) -> Tuntas KKTP',
+        svg: '<svg viewBox="0 0 240 130" height="140"><polygon points="120,10 185,48 120,86 55,48" fill="#FEE440"/><text x="120" y="53" text-anchor="middle" fill="#1B1464" font-weight="800" font-size="13">Terhalang?</text><rect x="145" y="96" width="85" height="26" rx="6" fill="#00F5D4"/><text x="187" y="114" text-anchor="middle" fill="#1B1464" font-weight="800" font-size="12">Ya: Belok</text><rect x="10" y="96" width="85" height="26" rx="6" fill="#2D1B69" stroke="#fff"/><text x="52" y="114" text-anchor="middle" fill="#fff" font-weight="700" font-size="12">Tidak: Maju</text></svg>'
+      },
+      {
+        cat: 'Konsep Algoritma',
+        title: 'Perulangan (For / While)',
+        desc: 'Mengulang blok perintah selama syarat benar atau sebanyak N kali iterasi.',
+        points: ['For/Repeat dipakai bila jumlah ulang diketahui.', 'While dipakai bila perulangan bergantung syarat dinamis.'],
+        code: 'REPEAT 4 KALI:\n  Maju()',
+        svg: '<svg viewBox="0 0 240 130" height="140"><polygon points="120,12 185,48 120,84 55,48" fill="#FEE440"/><text x="120" y="53" text-anchor="middle" fill="#1B1464" font-weight="800" font-size="13">Ulang &lt;= N?</text><rect x="60" y="96" width="120" height="28" rx="6" fill="#00F5D4"/><text x="120" y="115" text-anchor="middle" fill="#1B1464" font-weight="800" font-size="12">Jalankan Aksi</text></svg>'
+      }
+    ];
+    let materiIdx = 0;
+    function renderMateri() {
+      const m = MATERI[materiIdx];
+      document.getElementById('materi-counter').textContent = `Kartu ${materiIdx + 1} / ${MATERI.length}`;
+      document.getElementById('materi-cat').textContent = m.cat;
+      document.getElementById('materi-svg').innerHTML = m.svg;
+      document.getElementById('materi-code').textContent = m.code;
+      document.getElementById('materi-title').textContent = m.title;
+      document.getElementById('materi-desc').textContent = m.desc;
+      document.getElementById('materi-points').innerHTML = m.points.map(p => `<li>${p}</li>`).join('');
+      document.getElementById('materi-prev').disabled = materiIdx === 0;
+      document.getElementById('materi-next').disabled = materiIdx === MATERI.length - 1;
+    }
+    function changeMateri(d) {
+      playClick();
+      materiIdx = Math.max(0, Math.min(MATERI.length - 1, materiIdx + d));
+      renderMateri();
+    }
+
+    // ============== 15 PROGRESSIVE STAGES ==============
+    function openWalls(cols, rows, open) {
+      const s = new Set(open.map(([x, y]) => `${x},${y}`));
+      const w = [];
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) if (!s.has(`${x},${y}`)) w.push([x, y]);
+      return w;
+    }
+
+    const LEVELS = [
+      { id: 1, name: 'Level 1: Runtunan', sub: 'Sequencing' },
+      { id: 2, name: 'Level 2: Percabangan', sub: 'Branching / If-Else' },
+      { id: 3, name: 'Level 3: Perulangan', sub: 'Looping (For / While)' }
+    ];
+
+    const STAGES = [
+      { id:'L1-S1', lvl:1, num:1, title:'Langkah Pertama Robot', obj:'Gerakkan robot lurus melewati Gerbang Logika ke Finish.', cols:5, rows:5, start:{x:0,y:2,dir:'E'}, finish:{x:4,y:2}, walls:openWalls(5,5,[[0,2],[1,2],[2,2],[3,2],[4,2]]), gates:[{id:'g1',x:2,y:2,topic:'Simbol Flowchart',prompt:'Simbol oval/kapsul (Terminator) berfungsi untuk menandai...',opts:['A. Titik Mulai dan Selesai','B. Pengujian Ya/Tidak','C. Perhitungan matematika'],ans:0,exp:'Terminator berbentuk oval digunakan untuk Start dan End.'}], allow:['MOVE','LEFT','RIGHT'] },
+      { id:'L1-S2', lvl:1, num:2, title:'Belokan Sirkuit Pertama', obj:'Majukan robot ke ujung, lalu belok ke atas menuju Finish.', cols:5, rows:5, start:{x:0,y:4,dir:'E'}, finish:{x:3,y:1}, walls:openWalls(5,5,[[0,4],[1,4],[2,4],[3,4],[3,3],[3,2],[3,1]]), gates:[{id:'g2',x:3,y:4,topic:'Runtunan',prompt:'Berapa nilai akhir hasil dari: a=5; b=3; hasil=a+b*2 ?',opts:['A. 16','B. 11','C. 13'],ans:1,exp:'Perkalian dikerjakan dulu: 3*2=6, lalu 5+6=11.'}], allow:['MOVE','LEFT','RIGHT'] },
+      { id:'L1-S3', lvl:1, num:3, title:'Jalur Zig-Zag Lab', obj:'Navigasi lintasan berbelok dua kali menuju Finish.', cols:6, rows:5, start:{x:0,y:3,dir:'N'}, finish:{x:5,y:3}, walls:openWalls(6,5,[[0,3],[0,2],[0,1],[1,1],[2,1],[2,2],[2,3],[3,3],[4,3],[5,3]]), gates:[{id:'g3',x:2,y:1,topic:'Flowchart Proses',prompt:'Simbol apa yang digunakan untuk menghitung luas = p * l?',opts:['A. Belah Ketupat','B. Persegi Panjang (Process)','C. Oval'],ans:1,exp:'Operasi perhitungan digambarkan dengan simbol Persegi Panjang.'}], allow:['MOVE','LEFT','RIGHT'] },
+      { id:'L1-S4', lvl:1, num:4, title:'Lorong Berliku Palopo', obj:'Susun runtunan belok kanan dan dua kali belok kiri.', cols:6, rows:6, start:{x:1,y:5,dir:'N'}, finish:{x:2,y:1}, walls:openWalls(6,6,[[1,5],[1,4],[1,3],[2,3],[3,3],[4,3],[4,2],[4,1],[3,1],[2,1]]), gates:[{id:'g4',x:3,y:3,topic:'Trace Variabel',prompt:'Berapa nilai akhir x dari: x=4; y=x+3; x=y*2; ?',opts:['A. 8','B. 11','C. 14'],ans:2,exp:'y = 7, lalu x = 7 * 2 = 14.'}], allow:['MOVE','LEFT','RIGHT'] },
+      { id:'L1-S5', lvl:1, num:5, title:'Misi Gerbang Ganda', obj:'Buka dua Gerbang Logika dengan algoritma runtunan.', cols:6, rows:6, start:{x:0,y:1,dir:'E'}, finish:{x:5,y:3}, walls:openWalls(6,6,[[0,1],[1,1],[2,1],[2,2],[2,3],[3,3],[4,3],[5,3]]), gates:[{id:'g5a',x:2,y:1,topic:'Pertukaran Nilai',prompt:'Menukar isi variabel A dan B dalam runtunan membutuhkan...',opts:['A. Langsung menimpa A=B','B. Variabel sementara (temp)','C. Loop tak terbatas'],ans:1,exp:'Variabel bantu temp mencegah nilai awal hilang.'},{id:'g5b',x:2,y:3,topic:'Pseudocode',prompt:'skor=100; skor=skor+50; skor=skor-20; CETAK skor -> hasilnya?',opts:['A. 130','B. 150','C. 80'],ans:0,exp:'100 + 50 - 20 = 130.'}], allow:['MOVE','LEFT','RIGHT'] },
+
+      { id:'L2-S1', lvl:2, num:1, title:'Deteksi Penghalang', obj:'Gunakan If (Depan Terhalang) untuk berbelok saat bertemu tembok.', cols:5, rows:5, start:{x:1,y:3,dir:'E'}, finish:{x:2,y:1}, walls:openWalls(5,5,[[1,3],[2,3],[2,2],[2,1]]), gates:[{id:'g6',x:2,y:3,topic:'Decision Flowchart',prompt:'Jika x = 10 dan kondisi x > 5 bernilai True, ke arah mana robot melangkah?',code:'IF (x > 5) -> Jalur KANAN\nELSE -> Jalur KIRI',opts:['A. Jalur KANAN','B. Jalur KIRI','C. Berhenti'],ans:0,exp:'10 > 5 bernilai True sehingga menuju Jalur KANAN.'}], allow:['MOVE','LEFT','RIGHT','IF'], reqIf:true },
+      { id:'L2-S2', lvl:2, num:2, title:'Persimpangan Logika', obj:'Gunakan dua kali sensor If (Depan Terhalang) di tikungan.', cols:6, rows:5, start:{x:0,y:1,dir:'E'}, finish:{x:4,y:4}, walls:openWalls(6,5,[[0,1],[1,1],[2,1],[2,2],[2,3],[2,4],[3,4],[4,4]]), gates:[{id:'g7',x:2,y:3,topic:'If-Else KKTP',prompt:'Jika syarat Tuntas adalah nilai >= 75 dan nilai Andi = 75, hasilnya?',opts:['A. Belum Tuntas','B. Tuntas KKTP','C. Error'],ans:1,exp:'Operator >= mencakup nilai sama dengan (75 >= 75 adalah True).'}], allow:['MOVE','LEFT','RIGHT','IF'], reqIf:true },
+      { id:'L2-S3', lvl:2, num:3, title:'Sensor Dua Belokan', obj:'Belok kanan otomatis di setiap tembok dengan blok If.', cols:6, rows:6, start:{x:1,y:4,dir:'N'}, finish:{x:4,y:4}, walls:openWalls(6,6,[[1,4],[1,3],[1,2],[2,2],[3,2],[4,2],[4,3],[4,4]]), gates:[{id:'g8',x:2,y:2,topic:'Operator AND (&&)',prompt:'Hasil ekspresi (true && false) pada syarat masuk lab adalah...',opts:['A. true','B. false','C. null'],ans:1,exp:'Operator && bernilai true hanya jika kedua kondisi true.'}], allow:['MOVE','LEFT','RIGHT','IF'], reqIf:true },
+      { id:'L2-S4', lvl:2, num:4, title:'Gerbang Percabangan', obj:'Taklukkan 3 sudut dan 2 Gerbang Logika dengan sensor.', cols:6, rows:6, start:{x:0,y:5,dir:'N'}, finish:{x:4,y:1}, walls:openWalls(6,6,[[0,5],[0,4],[0,3],[1,3],[2,3],[2,2],[2,1],[3,1],[4,1]]), gates:[{id:'g9a',x:0,y:3,topic:'Operator OR (||)',prompt:'Jika A = false dan B = true, hasil (A || B) adalah...',opts:['A. true','B. false','C. undefined'],ans:0,exp:'OR bernilai true jika minimal satu kondisi bernilai true.'},{id:'g9b',x:2,y:1,topic:'Else-If',prompt:'IF(suhu>35) Panas ELSE IF(suhu>=28) Hangat ELSE Sejuk. Jika suhu=32?',opts:['A. Panas','B. Hangat','C. Sejuk'],ans:1,exp:'32 >= 28 bernilai True sehingga outputnya Hangat.'}], allow:['MOVE','LEFT','RIGHT','IF'], reqIf:true },
+      { id:'L2-S5', lvl:2, num:5, title:'Labirin Sensor Kompleks', obj:'Selesaikan labirin 2 gerbang menggunakan 3 sensor halangan.', cols:7, rows:6, start:{x:0,y:2,dir:'E'}, finish:{x:5,y:1}, walls:openWalls(7,6,[[0,2],[1,2],[2,2],[2,3],[2,4],[3,4],[4,4],[5,4],[5,3],[5,2],[5,1]]), gates:[{id:'g10a',x:1,y:2,topic:'Negasi Logika',prompt:'Jika a=8 dan b=5, nilai !(a > 10) && (b == 5) adalah...',opts:['A. False','B. True','C. Error'],ans:1,exp:'!(false) = true, dan true && true = true.'},{id:'g10b',x:4,y:4,topic:'Nested If',prompt:'level=2; poin=80; IF(level==2){ IF(poin>=75) bonus=50; ELSE bonus=20; } -> bonus?',opts:['A. 20','B. 50','C. 0'],ans:1,exp:'Kedua kondisi True sehingga bonus = 50.'}], allow:['MOVE','LEFT','RIGHT','IF'], reqIf:true },
+
+      { id:'L3-S1', lvl:3, num:1, title:'Lintasan Lurus Efisien', obj:'Gunakan 1 blok Repeat (5x) berisi Maju() menuju Finish.', cols:7, rows:5, start:{x:0,y:2,dir:'E'}, finish:{x:5,y:2}, walls:openWalls(7,5,[[0,2],[1,2],[2,2],[3,2],[4,2],[5,2]]), gates:[{id:'g11',x:3,y:2,topic:'Perulangan For',prompt:'Berapa kali Maju() dijalankan pada: for(i=1; i<=5; i++) Maju(); ?',opts:['A. 4 kali','B. 5 kali','C. 6 kali'],ans:1,exp:'Iterasi i = 1, 2, 3, 4, 5 berjalan tepat 5 kali.'}], allow:['MOVE','LEFT','RIGHT','IF','REPEAT'], reqRep:true },
+      { id:'L3-S2', lvl:3, num:2, title:'Tangga Sirkuit Berulang', obj:'Ulangi pola tangga (Maju, Kanan, Maju, Kiri) sebanyak 3 kali.', cols:6, rows:6, start:{x:0,y:5,dir:'N'}, finish:{x:3,y:2}, walls:openWalls(6,6,[[0,5],[0,4],[1,4],[1,3],[2,3],[2,2],[3,2]]), gates:[{id:'g12',x:1,y:3,topic:'Perulangan While',prompt:'Kapan perulangan WHILE lebih tepat dipakai dibanding FOR?',opts:['A. Jika hanya 1 baris','B. Jika jumlah ulang bergantung syarat dinamis (belum pasti)','C. Jika tidak butuh kondisi berhenti'],ans:1,exp:'While berjalan selama kondisi True.'}], allow:['MOVE','LEFT','RIGHT','IF','REPEAT'], reqRep:true },
+      { id:'L3-S3', lvl:3, num:3, title:'Patroli Kotak Otomatis', obj:'Gunakan Repeat (3x) berisi 3x Maju dan Belok Kanan.', cols:6, rows:6, start:{x:1,y:4,dir:'N'}, finish:{x:4,y:4}, walls:openWalls(6,6,[[1,4],[1,3],[1,2],[1,1],[2,1],[3,1],[4,1],[4,2],[4,3],[4,4]]), gates:[{id:'g13',x:3,y:1,topic:'Akumulasi Loop',prompt:'total=0; for(i=1; i<=4; i++) total += i; Berapa nilai total?',opts:['A. 6','B. 10','C. 14'],ans:1,exp:'1 + 2 + 3 + 4 = 10.'}], allow:['MOVE','LEFT','RIGHT','IF','REPEAT'], reqRep:true },
+      { id:'L3-S4', lvl:3, num:4, title:'Gelombang Labirin Ganda', obj:'Ulangi 2x pola gelombang (Maju, Maju, Kiri, Maju, Maju, Kanan).', cols:7, rows:6, start:{x:0,y:5,dir:'E'}, finish:{x:4,y:1}, walls:openWalls(7,6,[[0,5],[1,5],[2,5],[2,4],[2,3],[3,3],[4,3],[4,2],[4,1]]), gates:[{id:'g14a',x:2,y:3,topic:'Infinite Loop',prompt:'Penyebab infinite loop pada "while(x < 5) cetak(x)" adalah...',opts:['A. Salah tanda <','B. Nilai x tidak pernah diubah di dalam loop','C. Perintah cetak dilarang'],ans:1,exp:'Tanpa perubahan x, syarat x < 5 selalu True.'},{id:'g14b',x:4,y:2,topic:'Terminasi Loop',prompt:'Urutan output for(i=10; i>0; i-=3) adalah...',opts:['A. 10, 7, 4, 1','B. 10, 7, 4, 1, -2','C. 10, 8, 6, 4'],ans:0,exp:'Saat i = -2, syarat i > 0 menjadi False.'}], allow:['MOVE','LEFT','RIGHT','IF','REPEAT'], reqRep:true },
+      { id:'L3-S5', lvl:3, num:5, title:'Ujian Akhir Cyber Master', obj:'Gabungkan Repeat (12x) berisi If(Terhalang){Belok Kanan} + Maju()!', cols:7, rows:7, start:{x:1,y:5,dir:'N'}, finish:{x:5,y:5}, walls:openWalls(7,7,[[1,5],[1,4],[1,3],[1,2],[1,1],[2,1],[3,1],[4,1],[5,1],[5,2],[5,3],[5,4],[5,5]]), gates:[{id:'g15a',x:3,y:1,topic:'Loop + If',prompt:'counter=0; for(i=1;i<=6;i++) if(i%2==0) counter++; Berapa nilai counter?',opts:['A. 2','B. 3','C. 6'],ans:1,exp:'Angka genap antara 1..6 ada 3 yaitu 2, 4, 6.'},{id:'g15b',x:5,y:3,topic:'Efisiensi Algoritma',prompt:'Manfaat utama menggabungkan Repeat dan If adalah...',opts:['A. Kode lebih panjang','B. Kode ringkas sekaligus adaptif terhadap halangan','C. Menghapus titik Start'],ans:1,exp:'Loop meringkas kode dan If memberi kemampuan pengambilan keputusan.'}], allow:['MOVE','LEFT','RIGHT','IF','REPEAT'], reqIf:true, reqRep:true }
+    ];
+
+    let progress = JSON.parse(localStorage.getItem('algoquest_single_v1') || '{}');
+    let sessionScore = 0;
+    let currentStage = STAGES[0];
+    let blocks = [];
+    let targetRepeatId = null;
+    let lives = 3;
+    let robot = { x:0, y:0, dir:'E', crashed:false, visited:[] };
+    let unlockedGates = [];
+    let running = false;
+    let paused = false;
+    let runToken = 0;
+    let activeBlockId = null;
+    let quizResolve = null;
+
+    function goScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+      if (name === 'materi') renderMateri();
+      if (name === 'levels') renderLevels();
+      if (name === 'victory') renderVictory();
+      if (name === 'arena') setTimeout(drawMaze, 40);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function renderLevels() {
+      const doneCount = STAGES.filter(s => progress[s.id]?.done).length;
+      document.getElementById('levels-summary').textContent = `Tuntas: ${doneCount}/15 Stage · Skor: ${sessionScore}`;
+      const grid = document.getElementById('levels-grid');
+      grid.innerHTML = LEVELS.map(lvl => {
+        const sts = STAGES.filter(s => s.lvl === lvl.id);
+        const btns = sts.map(st => `<button class="stage-btn ${progress[st.id]?.done ? 'done' : ''}" onclick="playClick(); startStage('${st.id}')">${st.num}</button>`).join('');
+        return `<div class="card">
+          <p style="color:var(--cyan); font-family:var(--font-mono); font-weight:700;">${lvl.sub}</p>
+          <h3 style="font-size:24px; margin:4px 0 10px;">${lvl.name}</h3>
+          <div class="stage-grid">${btns}</div>
+          <button class="btn btn-cyan" style="width:100%; margin-top:8px;" onclick="playClick(); startStage('${sts[0].id}')">Mainkan Level ${lvl.id}</button>
+        </div>`;
+      }).join('');
+    }
+
+    function startStage(id) {
+      currentStage = STAGES.find(s => s.id === id) || STAGES[0];
+      blocks = [];
+      targetRepeatId = null;
+      lives = 3;
+      resetStage(false);
+      goScreen('arena');
+      renderPalette();
+      renderWorkspace();
+    }
+
+    function abortRun() {
+      runToken++;
+      running = false;
+      paused = false;
+      activeBlockId = null;
+      if (quizResolve) { quizResolve(false); quizResolve = null; }
+      closeModal('modal-quiz');
+    }
+
+    function resetStage(clear) {
+      abortRun();
+      if (clear) { blocks = []; targetRepeatId = null; lives = 3; }
+      unlockedGates = [];
+      robot = { x: currentStage.start.x, y: currentStage.start.y, dir: currentStage.start.dir, crashed: false, visited: [{x: currentStage.start.x, y: currentStage.start.y}] };
+      document.getElementById('hud-level').textContent = `Level ${currentStage.lvl} · Stage ${currentStage.num}/5`;
+      document.getElementById('hud-title').textContent = currentStage.title;
+      document.getElementById('stage-objective').textContent = currentStage.obj;
+      document.getElementById('arena-status').textContent = 'Susun blok algoritma lalu tekan Jalankan.';
+      document.getElementById('debug-box').classList.remove('show');
+      document.getElementById('btn-run').disabled = false;
+      document.getElementById('btn-pause').disabled = true;
+      updateHud();
+      renderWorkspace();
+      drawMaze();
+    }
+
+    function updateHud() {
+      document.getElementById('hud-lives').textContent = `Nyawa: ${lives}/3`;
+      document.getElementById('hud-score').textContent = `Skor: ${sessionScore}`;
+    }
+
+    function renderPalette() {
+      const p = document.getElementById('palette-area');
+      let html = '';
+      if (currentStage.allow.includes('MOVE')) html += `<button class="btn btn-cyan btn-sm" onclick="addBlock('MOVE')">Maju()</button>`;
+      if (currentStage.allow.includes('LEFT')) html += `<button class="btn btn-dark btn-sm" onclick="addBlock('LEFT')">Belok Kiri()</button>`;
+      if (currentStage.allow.includes('RIGHT')) html += `<button class="btn btn-dark btn-sm" onclick="addBlock('RIGHT')">Belok Kanan()</button>`;
+      if (currentStage.allow.includes('IF')) html += `<button class="btn btn-yellow btn-sm" onclick="addBlock('IF')">If (Terhalang)</button>`;
+      if (currentStage.allow.includes('REPEAT')) html += `<button class="btn btn-surface btn-sm" style="grid-column:span 2; border-color:var(--yellow);" onclick="addBlock('REPEAT')">+ Blok Repeat (N kali)</button>`;
+      p.innerHTML = html;
+    }
+
+    function addBlock(type) {
+      if (running) return;
+      playClick();
+      const id = 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+      const blk = type === 'IF' ? { id, type, action: 'RIGHT' } : type === 'REPEAT' ? { id, type, count: 3, children: [] } : { id, type };
+      if (type !== 'REPEAT' && targetRepeatId) {
+        const rep = blocks.find(b => b.id === targetRepeatId);
+        if (rep) { rep.children.push(blk); renderWorkspace(); return; }
+      }
+      blocks.push(blk);
+      if (type === 'REPEAT') targetRepeatId = id;
+      renderWorkspace();
+    }
+
+    function clearBlocks() {
+      if (running) return;
+      blocks = [];
+      targetRepeatId = null;
+      renderWorkspace();
+    }
+
+    function removeBlock(idx) {
+      if (running) return;
+      playClick();
+      if (blocks[idx].id === targetRepeatId) targetRepeatId = null;
+      blocks.splice(idx, 1);
+      renderWorkspace();
+    }
+
+    function changeRepeatCount(idx, d) {
+      if (running) return;
+      playClick();
+      blocks[idx].count = Math.max(2, Math.min(15, blocks[idx].count + d));
+      renderWorkspace();
+    }
+
+    function renderWorkspace() {
+      const box = document.getElementById('workspace-list');
+      if (blocks.length === 0) {
+        box.innerHTML = '<p style="color:var(--muted); text-align:center; margin:auto;">Belum ada blok. Klik blok di atas untuk menyusun algoritma.</p>';
+        return;
+      }
+      box.innerHTML = blocks.map((b, i) => {
+        const actClass = activeBlockId === b.id ? 'active-step' : '';
+        if (b.type === 'REPEAT') {
+          const isTarget = targetRepeatId === b.id;
+          const childrenHtml = b.children.map((ch, ci) => `
+            <div class="block-item ${activeBlockId === ch.id ? 'active-step' : ''}" style="padding:6px 10px;">
+              <div class="block-head">
+                <span>${ci + 1}. ${ch.type === 'IF' ? `If(Terhalang): <select onchange="blocks[${i}].children[${ci}].action=this.value"><option value="RIGHT" ${ch.action==='RIGHT'?'selected':''}>Belok Kanan()</option><option value="LEFT" ${ch.action==='LEFT'?'selected':''}>Belok Kiri()</option><option value="MOVE" ${ch.action==='MOVE'?'selected':''}>Maju()</option></select>` : labelOf(ch.type)}</span>
+                <button class="btn btn-surface btn-sm" style="padding:2px 8px;" onclick="blocks[${i}].children.splice(${ci},1);renderWorkspace()">×</button>
+              </div>
+            </div>`).join('');
+          return `<div class="block-item ${actClass}">
+            <div class="block-head">
+              <span>${i + 1}. Repeat <button onclick="changeRepeatCount(${i},-1)">-</button> ${b.count}x <button onclick="changeRepeatCount(${i},1)">+</button></span>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-dark btn-sm" style="padding:3px 8px; font-size:12px;" onclick="targetRepeatId='${isTarget ? '' : b.id}';renderWorkspace()">${isTarget ? 'Selesai Isi' : '+ Isi'}</button>
+                <button class="btn btn-surface btn-sm" style="padding:3px 8px;" onclick="removeBlock(${i})">×</button>
+              </div>
+            </div>
+            <div class="nested-children">${childrenHtml || '<small style="color:var(--muted);">Kosong</small>'}</div>
+          </div>`;
+        }
+        return `<div class="block-item ${actClass}">
+          <div class="block-head">
+            <span>${i + 1}. ${b.type === 'IF' ? `If(Terhalang): <select onchange="blocks[${i}].action=this.value"><option value="RIGHT" ${b.action==='RIGHT'?'selected':''}>Belok Kanan()</option><option value="LEFT" ${b.action==='LEFT'?'selected':''}>Belok Kiri()</option><option value="MOVE" ${b.action==='MOVE'?'selected':''}>Maju()</option></select>` : labelOf(b.type)}</span>
+            <button class="btn btn-surface btn-sm" style="padding:3px 8px;" onclick="removeBlock(${i})">×</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function labelOf(t) { return t === 'MOVE' ? 'Maju()' : t === 'LEFT' ? 'Belok Kiri()' : 'Belok Kanan()'; }
+
+    function drawMaze() {
+      const canvas = document.getElementById('maze-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(300, rect.width);
+      canvas.height = 400;
+      const cw = canvas.width, ch = canvas.height;
+      ctx.fillStyle = '#120D47';
+      ctx.fillRect(0, 0, cw, ch);
+
+      const cs = Math.floor(Math.min((cw - 24) / currentStage.cols, (ch - 24) / currentStage.rows));
+      const ox = Math.floor((cw - cs * currentStage.cols) / 2);
+      const oy = Math.floor((ch - cs * currentStage.rows) / 2);
+      const wSet = new Set(currentStage.walls.map(([x, y]) => `${x},${y}`));
+
+      for (let y = 0; y < currentStage.rows; y++) {
+        for (let x = 0; x < currentStage.cols; x++) {
+          const px = ox + x * cs, py = oy + y * cs;
+          if (wSet.has(`${x},${y}`)) {
+            ctx.fillStyle = '#2D1B69';
+            ctx.fillRect(px + 2, py + 2, cs - 4, cs - 4);
+          } else {
+            ctx.fillStyle = (x + y) % 2 === 0 ? '#18115B' : '#1E1569';
+            ctx.fillRect(px + 1, py + 1, cs - 2, cs - 2);
+          }
+        }
+      }
+
+      // Finish
+      const fx = ox + currentStage.finish.x * cs, fy = oy + currentStage.finish.y * cs;
+      ctx.strokeStyle = '#FEE440';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(fx + 5, fy + 5, cs - 10, cs - 10);
+      ctx.fillStyle = '#FEE440';
+      ctx.font = `bold ${Math.max(11, cs * 0.2)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('FINISH', fx + cs / 2, fy + cs / 2 + 4);
+
+      // Gates
+      currentStage.gates.forEach(g => {
+        const gx = ox + g.x * cs, gy = oy + g.y * cs;
+        const ok = unlockedGates.includes(g.id);
+        ctx.strokeStyle = ok ? '#10B981' : '#00F5D4';
+        ctx.strokeRect(gx + 5, gy + 5, cs - 10, cs - 10);
+        ctx.fillStyle = ok ? '#10B981' : '#FEE440';
+        ctx.fillText(ok ? 'OK' : '?', gx + cs / 2, gy + cs / 2 + 5);
+      });
+
+      // Robot
+      const rx = ox + (robot.x + 0.5) * cs, ry = oy + (robot.y + 0.5) * cs, rs = cs * 0.65;
+      ctx.fillStyle = robot.crashed ? '#FF4D6D' : '#3B278C';
+      ctx.strokeStyle = '#00F5D4';
+      ctx.lineWidth = 3;
+      ctx.fillRect(rx - rs / 2, ry - rs / 2, rs, rs);
+      ctx.strokeRect(rx - rs / 2, ry - rs / 2, rs, rs);
+      ctx.fillStyle = '#00F5D4';
+      ctx.fillRect(rx - rs * 0.24, ry - rs * 0.14, rs * 0.16, rs * 0.18);
+      ctx.fillRect(rx + rs * 0.08, ry - rs * 0.14, rs * 0.16, rs * 0.18);
+    }
+
+    function togglePause() {
+      paused = !paused;
+      document.getElementById('btn-pause').textContent = paused ? 'Lanjut' : 'Pause';
+    }
+
+    async function waitStep(ms, token) {
+      await new Promise(r => setTimeout(r, ms));
+      while (paused && token === runToken) await new Promise(r => setTimeout(r, 120));
+      return token === runToken;
+    }
+
+    function showDebug(msg) {
+      const box = document.getElementById('debug-box');
+      box.innerHTML = `<strong>Pesan Debugging:</strong> ${msg}`;
+      box.classList.add('show');
+    }
+
+    async function runAlgorithm() {
+      if (running || lives <= 0) return;
+      if (blocks.length === 0) { playWrong(); showDebug('Tambahkan minimal 1 blok perintah.'); return; }
+      if (currentStage.reqIf && !JSON.stringify(blocks).includes('"IF"')) { playWrong(); showDebug('Level 2 mewajibkan minimal 1 blok If (Terhalang).'); return; }
+      if (currentStage.reqRep && !JSON.stringify(blocks).includes('"REPEAT"')) { playWrong(); showDebug('Level 3 mewajibkan blok Repeat.'); return; }
+
+      playClick();
+      const token = ++runToken;
+      running = true;
+      paused = false;
+      unlockedGates = [];
+      robot = { x: currentStage.start.x, y: currentStage.start.y, dir: currentStage.start.dir, crashed: false, visited: [] };
+      document.getElementById('debug-box').classList.remove('show');
+      document.getElementById('btn-run').disabled = true;
+      document.getElementById('btn-pause').disabled = false;
+      drawMaze();
+
+      const wSet = new Set(currentStage.walls.map(([x, y]) => `${x},${y}`));
+      const rotL = d => ({N:'W',W:'S',S:'E',E:'N'})[d];
+      const rotR = d => ({N:'E',E:'S',S:'W',W:'N'})[d];
+      const fwd = (x, y, d) => d==='N'?{x,y:y-1}:d==='E'?{x:x+1,y}:d==='S'?{x,y:y+1}:{x:x-1,y};
+      const blocked = (x, y) => x < 0 || y < 0 || x >= currentStage.cols || y >= currentStage.rows || wSet.has(`${x},${y}`);
+
+      async function doSimple(act, lineLabel) {
+        if (act === 'LEFT') { robot.dir = rotL(robot.dir); playTurn(); drawMaze(); return 'OK'; }
+        if (act === 'RIGHT') { robot.dir = rotR(robot.dir); playTurn(); drawMaze(); return 'OK'; }
+        const n = fwd(robot.x, robot.y, robot.dir);
+        if (blocked(n.x, n.y)) {
+          robot.crashed = true; drawMaze(); playWrong();
+          lives = Math.max(0, lives - 1); updateHud();
+          showDebug(`${lineLabel}: Robot menabrak tembok/batas arena di (${n.x}, ${n.y}). Periksa arah belokan Anda!`);
+          return 'FAIL';
+        }
+        robot.x = n.x; robot.y = n.y; playStep(); drawMaze();
+        const gate = currentStage.gates.find(g => g.x === robot.x && g.y === robot.y && !unlockedGates.includes(g.id));
+        if (gate) {
+          const ok = await promptQuiz(gate);
+          if (token !== runToken) return 'ABORT';
+          if (!ok) {
+            lives = Math.max(0, lives - 1); updateHud();
+            showDebug(`Gerbang Logika: Jawaban salah. ${gate.exp}`);
+            return 'FAIL';
+          }
+          unlockedGates.push(gate.id);
+          sessionScore += 100; updateHud(); drawMaze();
+        }
+        if (robot.x === currentStage.finish.x && robot.y === currentStage.finish.y) return 'WIN';
+        return 'OK';
+      }
+
+      async function execList(list) {
+        for (let i = 0; i < list.length; i++) {
+          const b = list[i];
+          activeBlockId = b.id; renderWorkspace();
+          if (!(await waitStep(360, token))) return 'ABORT';
+          if (b.type === 'REPEAT') {
+            for (let k = 0; k < b.count; k++) {
+              const r = await execList(b.children);
+              if (r !== 'OK') return r;
+            }
+          } else if (b.type === 'IF') {
+            const ahead = fwd(robot.x, robot.y, robot.dir);
+            if (blocked(ahead.x, ahead.y)) {
+              const r = await doSimple(b.action, `If Baris #${i + 1}`);
+              if (r !== 'OK') return r;
+            }
+          } else {
+            const r = await doSimple(b.type, `Baris #${i + 1}`);
+            if (r !== 'OK') return r;
+          }
+        }
+        return 'OK';
+      }
+
+      const res = await execList(blocks);
+      if (token !== runToken) return;
+      running = false;
+      activeBlockId = null;
+      document.getElementById('btn-run').disabled = false;
+      document.getElementById('btn-pause').disabled = true;
+      renderWorkspace();
+
+      if (res === 'WIN') {
+        playVictory();
+        sessionScore += 150;
+        progress[currentStage.id] = { done: true, score: Math.max(progress[currentStage.id]?.score || 0, 250) };
+        localStorage.setItem('algoquest_single_v1', JSON.stringify(progress));
+        updateHud();
+        document.getElementById('arena-status').textContent = 'Misi Tuntas! Memuat tantangan berikutnya...';
+        setTimeout(() => {
+          const idx = STAGES.findIndex(s => s.id === currentStage.id);
+          if (idx < STAGES.length - 1) startStage(STAGES[idx + 1].id);
+          else goScreen('victory');
+        }, 1200);
+      } else if (res === 'OK') {
+        playWrong();
+        lives = Math.max(0, lives - 1); updateHud();
+        showDebug('Semua blok selesai dijalankan, namun robot belum sampai ke titik Finish.');
+      }
+      if (lives === 0) {
+        setTimeout(() => { lives = 3; updateHud(); }, 1600);
+      }
+    }
+
+    function promptQuiz(gate) {
+      return new Promise(resolve => {
+        quizResolve = resolve;
+        document.getElementById('quiz-topic').textContent = gate.topic;
+        document.getElementById('quiz-prompt').textContent = gate.prompt;
+        const codeEl = document.getElementById('quiz-code');
+        if (gate.code) { codeEl.style.display = 'block'; codeEl.textContent = gate.code; } else { codeEl.style.display = 'none'; }
+        const fb = document.getElementById('quiz-feedback');
+        fb.style.display = 'none';
+        const opts = document.getElementById('quiz-options');
+        opts.innerHTML = gate.opts.map((o, idx) => `<button class="quiz-opt" onclick="answerQuiz(${idx},${gate.ans},'${gate.exp.replace(/'/g,"\\'")}')">${o}</button>`).join('');
+        openModal('modal-quiz');
+      });
+    }
+
+    function answerQuiz(idx, ans, exp) {
+      if (!quizResolve) return;
+      const ok = idx === ans;
+      const fb = document.getElementById('quiz-feedback');
+      fb.style.display = 'block';
+      fb.style.background = ok ? '#093a2b' : '#45122b';
+      fb.textContent = (ok ? 'Benar (+100)! ' : 'Kurang tepat! ') + exp;
+      if (ok) playCorrect(); else playWrong();
+      const res = quizResolve;
+      quizResolve = null;
+      setTimeout(() => { closeModal('modal-quiz'); res(ok); }, 1100);
+    }
+
+    function renderVictory() {
+      const done = STAGES.filter(s => progress[s.id]?.done).length;
+      const stars = sessionScore >= 1200 || done >= 5 ? 3 : sessionScore >= 500 || done >= 2 ? 2 : 1;
+      document.getElementById('victory-stars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+      document.getElementById('victory-score').textContent = sessionScore;
+      document.getElementById('victory-stages').textContent = `${done} / 15 Stage Tuntas`;
+      document.getElementById('victory-feedback').textContent =
+        stars === 3 ? 'Luar biasa! Anda menguasai logika algoritma PPLG dengan sangat baik.' : 'Kerja bagus! Terus berlatih menyelesaikan tantangan di setiap level.';
+      updateCertPreview();
+    }
+
+    function updateCertPreview() {
+      const name = document.getElementById('cert-name').value.trim() || 'Nama Peserta Didik';
+      const cls = document.getElementById('cert-class').value.trim() || 'X PPLG 1';
+      const done = STAGES.filter(s => progress[s.id]?.done).length;
+      document.getElementById('preview-name').textContent = name;
+      document.getElementById('preview-class').textContent = 'Kelas: ' + cls;
+      document.getElementById('preview-metrics').textContent = `Skor: ${sessionScore}  |  Stage: ${done}/15`;
+    }
+
+    function downloadCertPng() {
+      const c = document.createElement('canvas');
+      c.width = 1100; c.height = 750;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#1B1464'; ctx.fillRect(0, 0, 1100, 750);
+      ctx.strokeStyle = '#00F5D4'; ctx.lineWidth = 10; ctx.strokeRect(25, 25, 1050, 700);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#00F5D4'; ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('SMKN 4 KOTA PALOPO · PPLG', 550, 100);
+      ctx.fillStyle = '#FEE440'; ctx.font = 'bold 46px sans-serif';
+      ctx.fillText('SERTIFIKAT KELULUSAN ALGOQUEST', 550, 170);
+      const name = document.getElementById('cert-name').value.trim() || 'Peserta Didik PPLG';
+      const cls = document.getElementById('cert-class').value.trim() || 'X PPLG 1';
+      ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 44px sans-serif';
+      ctx.fillText(name, 550, 310);
+      ctx.fillStyle = '#FEE440'; ctx.font = 'bold 26px sans-serif';
+      ctx.fillText('Kelas: ' + cls, 550, 365);
+      const done = STAGES.filter(s => progress[s.id]?.done).length;
+      ctx.fillStyle = '#00F5D4'; ctx.font = 'bold 28px monospace';
+      ctx.fillText(`Total Skor: ${sessionScore}  |  Stage Tuntas: ${done}/15`, 550, 460);
+      ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('Mutmainna, S.Kom', 550, 620);
+      ctx.fillStyle = '#CBD5E1'; ctx.font = '18px sans-serif';
+      ctx.fillText('Pengembang & Guru PPLG SMKN 4 Kota Palopo', 550, 652);
+      const a = document.createElement('a');
+      a.download = `Sertifikat_AlgoQuest_${name.replace(/\s+/g,'_')}.png`;
+      a.href = c.toDataURL('image/png');
+      a.click();
+    }
+  </script>
+</body>
+</html>

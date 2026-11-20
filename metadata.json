@@ -1,0 +1,6 @@
+{
+  "name": "AlgoQuest: Petualangan Logika Algoritma SMK",
+  "description": "Game edukasi interaktif PPLG SMKN 4 Kota Palopo untuk belajar algoritma, flowchart, percabangan, dan perulangan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
